@@ -26,7 +26,7 @@ from monaco.stats import pct
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     src = ap.add_argument_group('input (contract: account_id, partner_id, event, ts)')
-    src.add_argument('--db', default=None, help='DuckDB file (default: $MONACO_DATA/alpaca_sandbox.duckdb)')
+    src.add_argument('--db', default=None, help='DuckDB file (default: $MONACO_DATA/sandbox.duckdb)')
     src.add_argument('--sql', default=str(SQL_DIR / 'funnel_events.sql'), help='SQL file or text producing the event table')
     src.add_argument('--csv', help='CSV with the event table instead of --db/--sql')
     src.add_argument('--parquet', help='Parquet with the event table instead of --db/--sql')

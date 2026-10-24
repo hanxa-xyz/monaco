@@ -21,9 +21,8 @@ dependencies = [
 [project.optional-dependencies]
 model = ["scikit-learn>=1.2", "xgboost>=1.7"]
 notebook = ["nbformat>=5.7", "nbconvert>=7.0", "ipykernel>=6.20", "jupyter_client>=7.4"]
-live = ["requests>=2.28"]
 dev = ["pytest>=7.0", "ruff>=0.4"]
-all = ["monaco[model,notebook,live,dev]"]
+all = ["monaco[model,notebook,dev]"]
 
 [project.scripts]
 monaco-sandbox = "monaco.sandbox.load_sandbox:main"

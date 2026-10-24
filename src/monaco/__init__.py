@@ -12,7 +12,7 @@ io              DuckDB / CSV / parquet loading with column mapping onto a contra
 readout         table printing, markdown tables, PNG saving, and the readout writer that FORCES the close
 funnel          stage funnel + cohort retention on a (entity_id, group_id, event, ts) event table
 partner_health  concentration, trends and early-warning flags on a group x month table
-sandbox         synthetic Broker-API-shaped data (real field names and enums) in DuckDB
+sandbox         synthetic B2B2C brokerage-platform dataset (partners, accounts, KYC events, transfers, orders, fills) in DuckDB
 paths           where data and outputs live (MONACO_DATA / MONACO_OUT)
 """
 __version__ = '0.1.0'

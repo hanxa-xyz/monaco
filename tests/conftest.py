@@ -29,10 +29,10 @@ def tiny_df():
 
 @pytest.fixture(scope='session')
 def sandbox_db(tmp_path_factory):
-    """A small synthetic Broker-API-shaped DuckDB (6 partners, ~1,500 accounts). ~5s once per session."""
+    """A small synthetic platform DuckDB (6 partners, ~1,500 accounts). ~5s once per session."""
     from monaco.sandbox import synth
     from monaco.sandbox.load_sandbox import load, report
-    db = tmp_path_factory.mktemp('data') / 'alpaca_sandbox.duckdb'
+    db = tmp_path_factory.mktemp('data') / 'sandbox.duckdb'
     frames = synth.generate(seed=3, n_partners=6, n_accounts=1500, start='2025-06-01', as_of='2026-10-22')
     frames['_mode'] = 'synthetic'
     con = load(frames, db)

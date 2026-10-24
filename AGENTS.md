@@ -24,11 +24,11 @@ them up in this checkout, and installable elsewhere with `scripts/install_skills
 | `src/monaco/readout.py` | `print_table()`, `md_table()`, `save_png()`, `write_readout()` with the **forced close** |
 | `src/monaco/funnel.py` | stage funnel + cohort retention on `(account_id, partner_id, event, ts)` |
 | `src/monaco/partner_health.py` | concentration (Pareto/HHI), per-group trends with intervals, early-warning flags |
-| `src/monaco/sandbox/` | synthetic Broker-API-shaped data (real field names + enums) → DuckDB; the SQL that maps it onto the contracts |
+| `src/monaco/sandbox/` | synthetic B2B2C brokerage-platform dataset → DuckDB; the SQL that maps it onto the contracts |
 | `src/monaco/templates/` | `build_eda.py`, `build_report.py`, `HANDOFF.md` starting points |
-| `skills/` | Claude Code skills: `/eda*`, `/model`, `/takehome-*`, `/alpaca-*`, `/medal-autoclip` |
+| `skills/` | Claude Code skills: `/eda*`, `/model`, `/takehome-*`, `/funnel-cohort`, `/partner-health` |
 | `docs/PLAYBOOK.md` | the long-form rules; this file is the short form |
-| `docs/alpaca/` | metric definitions, Broker API object model, pre-start notes |
+| `docs/contracts.md` | the column contracts and metric definitions the funnel / partner-health modules read |
 | `tests/` | pytest; runs in seconds with no data files |
 
 Entry points after `pip install -e ".[all]"`: `monaco-sandbox`, `monaco-funnel`, `monaco-partner-health`.
@@ -63,7 +63,7 @@ Data goes to `$MONACO_DATA` (default `./data`), outputs to `$MONACO_OUT` (defaul
 4. Sizing via `/takehome-sizing` (dials, haircuts, two routes to the same number). Report via `/takehome-report`.
 5. `/takehome-handoff` at the end of every session so the next session starts cheap.
 
-For funnel or partner questions on Broker-API-shaped data, `/alpaca-funnel-cohort` and `/alpaca-partner-health`
+For funnel or partner questions on any platform-with-partners data, `/funnel-cohort` and `/partner-health`
 run end to end on the contract columns; map foreign column names with `--cols`, never by editing the data.
 
 ## Working on the code

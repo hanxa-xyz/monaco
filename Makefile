@@ -11,7 +11,7 @@ test:             ## unit tests (fast; no DuckDB file needed)
 lint:
 	$(PY) -m ruff check src tests
 
-sandbox:          ## build the synthetic Broker-API-shaped DuckDB under ./data
+sandbox:          ## build the synthetic platform DuckDB under ./data
 	monaco-sandbox
 
 funnel:           ## account funnel + cohort retention readout under ./out/funnel

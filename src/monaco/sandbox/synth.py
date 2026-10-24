@@ -1,4 +1,4 @@
-"""synth — synthetic Broker API rows with the REAL field names and enum values.
+"""synth — synthetic embedded-brokerage platform rows (partners, accounts, KYC events, funding, orders, fills).
 
 Used by load_sandbox.py when live sandbox credentials are absent. Everything is deterministic for a seed.
 The generator bakes in four partner scenarios so the two skills have something to find:
@@ -85,7 +85,7 @@ def gen_partners(rng, n_partners, start, as_of):
     df = pd.DataFrame({
         'correspondent': codes, 'partner_name': ['Partner ' + c for c in codes], 'partner_type': types,
         'country': rng.choice(COUNTRIES, n_partners), 'onboarded_at': onboarded.dt.date,
-        'kyc_flow': np.where(types == 'bd', 'fully_disclosed_bd', 'alpaca_kyc'),
+        'kyc_flow': np.where(types == 'bd', 'fully_disclosed_bd', 'platform_kyc'),
         'instant_funding': np.isin(types, ['fintech', 'neobank']) & (rng.random(n_partners) < 0.4),
         '_weight': weight,
     })
@@ -138,7 +138,7 @@ def gen_accounts(rng, partners, start, as_of, n_target):
     u = rng.random(n)
     fd = flow == 'fully_disclosed_bd'
     passed = u < p_pass
-    # branch for non-pass under Alpaca KYC: ACTION_REQUIRED (60%) or APPROVAL_PENDING (40%)
+    # branch for non-pass under platform KYC: ACTION_REQUIRED (60%) or APPROVAL_PENDING (40%)
     branch = np.where(rng.random(n) < 0.6, 'AR', 'AP')
     ar_out = rng.choice(['approve', 'stuck', 'reject'], n, p=[0.55, 0.30, 0.15])
     ap_out = rng.choice(['approve', 'reject'], n, p=[0.75, 0.25])
@@ -159,7 +159,7 @@ def gen_accounts(rng, partners, start, as_of, n_target):
     fd_rej = fd & (rng.random(n) < 0.01)
     approved_at[fd & ~fd_rej] = created[fd & ~fd_rej]
     rejected_at[fd_rej] = _ts(created[fd_rej], rng.uniform(0.01, 0.2, fd_rej.sum())).values
-    # alpaca kyc: pass -> APPROVED after ~30 min median
+    # platform kyc: pass -> APPROVED after ~30 min median
     m = ~fd & passed
     approved_at[m] = _ts(created[m], _lognorm_days(rng, 0.02, 1.0, m.sum())).values
     # non-pass, ACTION_REQUIRED branch

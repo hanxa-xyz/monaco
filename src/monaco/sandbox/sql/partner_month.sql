@@ -1,4 +1,4 @@
--- Partner health inputs, grain = partner x calendar month. Contract for /alpaca-partner-health:
+-- Partner health inputs, grain = partner x calendar month. Contract for /partner-health:
 --   partner_id, month, new_accounts, kyc7_n, kyc7_k, fund30_n, fund30_k, funded_new, gross_deposits,
 --   withdrawals, net_deposits, trading_accounts, fills, filled_notional [, as_of]
 -- Cohort-style rates (kyc7, fund30) are keyed by the account's CREATION month and only count accounts old

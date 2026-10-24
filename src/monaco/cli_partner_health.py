@@ -26,7 +26,7 @@ from monaco.stats import pct
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     src = ap.add_argument_group('input')
-    src.add_argument('--db', default=None, help='DuckDB file (default: $MONACO_DATA/alpaca_sandbox.duckdb)')
+    src.add_argument('--db', default=None, help='DuckDB file (default: $MONACO_DATA/sandbox.duckdb)')
     src.add_argument('--sql-month', default=str(SQL_DIR / 'partner_month.sql'))
     src.add_argument('--sql-accounts', default=str(SQL_DIR / 'partner_accounts.sql'))
     src.add_argument('--csv-month', help='CSV with the partner x month table instead of --db')

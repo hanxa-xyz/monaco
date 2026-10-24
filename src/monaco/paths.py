@@ -29,4 +29,4 @@ def out_dir(*sub) -> Path:
 
 
 def default_db() -> Path:
-    return data_dir() / 'alpaca_sandbox.duckdb'
+    return data_dir() / 'sandbox.duckdb'

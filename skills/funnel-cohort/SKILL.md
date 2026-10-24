@@ -1,13 +1,13 @@
 ---
-name: alpaca-funnel-cohort
-description: Broker API account funnel on a schema-agnostic event table (account_id, partner_id, event, ts) — W-day stage conversion by partner and by creation cohort with Wilson CIs and censoring-aware denominators, pooled vs partner-weighted rates, time-to-stage CDFs, funded-cohort retention triangle + curves, active-at-Mk by partner — every table printed, readout with the forced close. Use when the user says "/alpaca-funnel-cohort", "run the funnel", "activation by partner", "cohort retention", or hands over any created → KYC → funded → first-trade event data.
+name: funnel-cohort
+description: Account/user funnel for a platform with partners (B2B2C) on a schema-agnostic event table (account_id, partner_id, event, ts) — W-day stage conversion by partner and by creation cohort with Wilson CIs and censoring-aware denominators, pooled vs partner-weighted rates, time-to-stage CDFs, funded-cohort retention triangle + curves, active-at-Mk by partner — every table printed, readout with the forced close. Use when the user says "/funnel-cohort", "run the funnel", "activation by partner", "cohort retention", or hands over any created → KYC → funded → first-trade event data.
 user-invocable: true
 ---
 
-# /alpaca-funnel-cohort — the account funnel, cohort-aware, in one command
+# /funnel-cohort — the account funnel, cohort-aware, in one command
 
-Code: `scripts/funnel.py` (views), `scripts/run.py` (CLI). Shared plumbing: `src/monaco/{io,stats,readout}.py`.
-Definitions: `docs/alpaca/metric_definitions.md`. Default input: the sandbox DuckDB built by
+Code: `src/monaco/funnel.py` (views), `src/monaco/cli_funnel.py` (CLI; `scripts/run.py` is a wrapper). Plumbing: `src/monaco/{io,stats,readout}.py`.
+Definitions: `docs/contracts.md`. Default input: the sandbox DuckDB built by
 ``monaco-sandbox` (src/monaco/sandbox/load_sandbox.py)` through `src/monaco/sandbox/sql/funnel_events.sql`.
 
 ## Run it
@@ -36,7 +36,7 @@ The contract is four columns; everything upstream of them is the SQL file's prob
 | conversion by cohort | lines by creation month, band on the last stage | "Same age for every cohort, so this is cohort quality, not maturity." |
 | time to stage | step CDF per consecutive pair, p50/p75/p90, plateau = ever arrived | "The gap to 100% is drop-off, not slowness." |
 | retention triangle + curves | funded cohort × age; quarterly curves, black pooled | "Rows → columns → diagonals, in that order." |
-| active at Mk by partner | `eda_views.penetration` | "A rate within the partner; pair with its size." |
+| active at Mk by partner | `monaco.eda.penetration` | "A rate within the partner; pair with its size." |
 
 ## Method, said once
 - **Censoring:** W-day rates only include accounts created ≥ W days before as_of. Retention ages beyond the last complete

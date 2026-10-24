@@ -1,8 +1,8 @@
 -- Account funnel as a long event table: one row per (account, event, ts). Schema-agnostic contract for
--- /alpaca-funnel-cohort: account_id, partner_id, event, ts. Rewrite this file for the real warehouse;
+-- /funnel-cohort: account_id, partner_id, event, ts. Rewrite this file for the real warehouse;
 -- the skill never needs to change. DuckDB dialect; every construct here exists in Snowflake/BigQuery/Postgres.
 --
--- Stage definitions (docs/metric_definitions.md):
+-- Stage definitions (docs/contracts.md):
 --   created       accounts.created_at (live accounts only; PAPER_ONLY excluded)
 --   kyc_approved  first status transition to APPROVED or ACTIVE (Events API)
 --   funded        first COMPLETE INCOMING transfer, or first executed JNLC into the account

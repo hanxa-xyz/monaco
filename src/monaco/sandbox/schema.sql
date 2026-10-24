@@ -1,5 +1,5 @@
--- Alpaca Broker API object model as a DuckDB schema. Real field names and enum values
--- (docs/broker_api_object_model.md). Enums are enforced with DuckDB ENUM types so a bad
+-- Synthetic embedded-brokerage platform as a DuckDB schema (partners embed trading for their end users).
+-- Field names and enum values follow common brokerage-API conventions. Enums are enforced with DuckDB ENUM types so a bad
 -- value fails at load, not in a chart.
 
 CREATE TYPE account_status AS ENUM ('INACTIVE','PAPER_ONLY','ONBOARDING','SUBMITTED','SUBMISSION_FAILED',
@@ -35,7 +35,7 @@ CREATE TABLE partners (
     partner_type    VARCHAR,                        -- fintech | neobank | ria | bd | crypto_exchange
     country         VARCHAR,
     onboarded_at    DATE,
-    kyc_flow        VARCHAR,                        -- alpaca_kyc | fully_disclosed_bd (own KYC, starts APPROVED)
+    kyc_flow        VARCHAR,                        -- platform_kyc | fully_disclosed_bd (own KYC, starts APPROVED)
     instant_funding BOOLEAN                         -- funds users via JNLC from a firm account
 );
 
