@@ -1,0 +1,24 @@
+# python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# generated data and outputs (MONACO_DATA / MONACO_OUT defaults)
+data/*
+!data/.gitkeep
+out/
+*.duckdb
+*.duckdb.wal
+
+# notebooks keep their source, not their outputs — strip with `make clean-nb`
+notebooks/*.html
+
+# local
+.env
+.DS_Store

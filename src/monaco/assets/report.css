@@ -1,0 +1,32 @@
+/* ds-interviews house report stylesheet — extracted verbatim from the Faire submission
+   (companies/faire/scripts/build_bang.py). Type scale in rem so nesting never compounds:
+   1.65 h1 · 1.22 h2 · 1.08 h3 · 1.00 body · 0.92 annotation (box/hyp/card/table) · 0.84 fine print.
+   Classes: .box (orange callout) .box.muted (grey) .hyp (hypothesis+caveat) .howto (how-to-read)
+   .assume (per-section assumptions) .fignote (chart footnote) .cards/.card/.big (stat cards)
+   .illus (illustrative-data warning) .sub .small ol/ul.tight */
+body{font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;max-width:880px;margin:32px auto;padding:0 24px;color:#1a1a1a;font-size:16px;line-height:1.5}
+p{margin:.6em 0}
+ol,ul{margin:.4em 0;padding-left:1.5em}
+h1{font-size:1.65rem;line-height:1.25;margin:0 0 .2em;border-bottom:3px solid #1a1a1a;padding-bottom:.3em}
+h2{font-size:1.22rem;line-height:1.3;margin:1.6em 0 .55em;border-bottom:1px solid #e6e6e6;padding-bottom:.18em}
+h3{font-size:1.08rem;line-height:1.35;margin:1.4em 0 .45em;color:#b34212}
+.sub{font-size:1rem;color:#555;margin-top:.3em}
+table{border-collapse:collapse;margin:1em 0;font-size:.92rem}
+td{border:1px solid #ddd;padding:6px 10px}
+img{margin:.8em 0;border:1px solid #eee;border-radius:4px}
+.box{background:#fff4ee;border-left:4px solid #eb6834;padding:11px 15px;margin:.8em 0;font-size:.92rem}
+.box.muted{background:#f6f6f6;border-left-color:#9a9a9a}
+.illus{background:#fdeceb;border-left:4px solid #d0453f;padding:11px 15px;margin:.8em 0;font-size:.92rem;color:#5a2422}
+.hyp{background:#fdf6ec;border-left:4px solid #b34212;padding:11px 15px;margin:.8em 0;font-size:.92rem;color:#3a2a1e}
+.howto{font-size:.84rem;line-height:1.5;color:#555;background:#fafafa;border-left:3px solid #ddd;padding:8px 13px;margin:-2px 0 16px}
+.assume{font-size:.84rem;line-height:1.5;color:#555;background:#f6f6f6;border-left:3px solid #bbb;padding:8px 13px;margin:.7em 0 1.1em}
+.fignote{font-size:.84rem;color:#777;margin:-4px 0 10px;padding:0 2px;line-height:1.45}
+.cards{display:flex;gap:12px;margin:.9em 0}
+.card{flex:1;background:#fff4ee;border:1px solid #f4d3c0;border-radius:6px;padding:13px;text-align:center;font-size:.92rem;line-height:1.4}
+.card.light{background:#fafafa;border-color:#e6e6e6}
+.card .big{font-size:1.5rem;line-height:1.15;font-weight:bold;color:#1a1a1a;margin-bottom:3px}
+.card .small,.small{font-size:.84rem;line-height:1.4;color:#777}
+li{margin-bottom:.35em}
+ol.tight li,ul.tight li{margin-bottom:.18em}
+ul.tight{margin-top:.25em}
+li>ul,li>ol{font-size:1em;margin:.2em 0;color:#333}
