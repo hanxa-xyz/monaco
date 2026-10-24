@@ -31,6 +31,8 @@ enums, four planted partner stories) under `./data`, then runs the two analytics
 
 - `out/funnel/readout.md` + `out/funnel/figs/` — 30-day stage conversion by partner and by cohort, time-to-stage, retention.
 - `out/partner_health/readout.md` + `out/partner_health/figs/` — Pareto/HHI concentration, per-partner trends, early-warning flags.
+- `monaco-survival` → `out/survival/` — time from funded to first trade with censoring, by partner, log-rank.
+- `monaco-did` → `out/did/` — difference-in-differences and event study that recover a planted single-partner drop.
 
 Both readouts end with the five-line close (Headline → Go / No-go → Action → Guardrail → Revisit). Lines
 the code drafted from numbers are tagged `[draft]`; finishing them is the analyst's job, and the tag makes
@@ -71,10 +73,13 @@ v.table
 | `monaco.modeling` | RandomForest + XGBoost, deterministic decisions, leakage tripwire, PDPs, ranked hypotheses |
 | `monaco.funnel` | W-day conversion with Wilson CIs and censoring-aware denominators, cohort lines, time-to-stage CDFs, retention triangle |
 | `monaco.partner_health` | Lorenz/Gini/HHI, small-multiple trends with intervals, flags net of the portfolio's own move |
+| `monaco.survival` | Kaplan-Meier + Greenwood CI, at-risk row, median/RMST, peak-hazard window, log-rank, naive-vs-KM bias view |
+| `monaco.causal` | method ladder, DiD + event study with cluster bootstrap and pre-trend test, CUPED, IPW with overlap/balance, ITS |
 | `monaco.readout` | print every table you chart; the readout writer that forces the close |
 | `monaco.sandbox` | synthetic platform dataset: partners, accounts, KYC events, transfers, orders, fills |
-| `skills/` | `/eda*`, `/model`, `/takehome-*` (kickstart → eda → charts → notebooks → sizing → report → handoff), `/funnel-cohort`, `/partner-health` |
+| `skills/` | `/eda*`, `/model`, `/takehome-*` (kickstart → eda → charts → notebooks → sizing → report → handoff), `/funnel-cohort`, `/partner-health`, `/survival`, `/causal` |
 | `docs/contracts.md` | the column contracts and metric definitions the funnel / partner-health modules read |
+| `docs/causal.md`, `docs/survival.md` | the method ladder with assumptions; time-to-event with censoring |
 | `docs/PLAYBOOK.md` | the full rulebook; `AGENTS.md` is the short form for agents |
 
 ## Development

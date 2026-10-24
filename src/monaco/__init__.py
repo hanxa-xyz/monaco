@@ -12,6 +12,8 @@ io              DuckDB / CSV / parquet loading with column mapping onto a contra
 readout         table printing, markdown tables, PNG saving, and the readout writer that FORCES the close
 funnel          stage funnel + cohort retention on a (entity_id, group_id, event, ts) event table
 partner_health  concentration, trends and early-warning flags on a group x month table
+survival        Kaplan-Meier with censoring: CI, median/RMST, log-rank, peak-hazard window, naive-vs-KM
+causal          method ladder; DiD + event study, CUPED, IPW, ITS — assumption printed next to the estimate
 sandbox         synthetic B2B2C brokerage-platform dataset (partners, accounts, KYC events, transfers, orders, fills) in DuckDB
 paths           where data and outputs live (MONACO_DATA / MONACO_OUT)
 """

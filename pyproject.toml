@@ -28,6 +28,8 @@ all = ["monaco[model,notebook,dev]"]
 monaco-sandbox = "monaco.sandbox.load_sandbox:main"
 monaco-funnel = "monaco.cli_funnel:main"
 monaco-partner-health = "monaco.cli_partner_health:main"
+monaco-survival = "monaco.cli_survival:main"
+monaco-did = "monaco.cli_did:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

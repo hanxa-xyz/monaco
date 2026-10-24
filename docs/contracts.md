@@ -59,6 +59,12 @@ portfolio is the mix guard: a seasonal month moves everyone, and that is not a p
 months of negative net deposits is a *contraction* flag; any partner above 25% of a portfolio total is a
 standing *concentration* flag regardless of trend. Thin partners are listed, never flagged.
 
+## Survival contract — `monaco.survival`, `/survival`
+`duration, event[, group]`, or `(start, end, as_of)` via `from_timestamps()`; see `docs/survival.md`.
+
+## Panel contract — `monaco.causal.did`, `/causal`
+`unit, period, y, treated, post` on unit × period rows (units are the bootstrap clusters); see `docs/causal.md`.
+
 ## The sandbox mapping (what the shipped SQL does)
 
 `src/monaco/sandbox/sql/*.sql` map the synthetic brokerage-platform tables onto the contracts above:

@@ -20,7 +20,13 @@ funnel:           ## account funnel + cohort retention readout under ./out/funne
 health:           ## partner concentration, trends, early-warning flags under ./out/partner_health
 	monaco-partner-health
 
-demo: sandbox funnel health   ## the whole thing, end to end, from a clean checkout
+survival:         ## time-to-event (KM) readout under ./out/survival
+	monaco-survival
+
+did:              ## difference-in-differences + event study under ./out/did
+	monaco-did
+
+demo: sandbox funnel health survival did   ## the whole thing, end to end, from a clean checkout
 
 skills:           ## link ./skills into ~/.claude/skills so every project sees them
 	scripts/install_skills.sh
