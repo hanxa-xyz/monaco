@@ -22,3 +22,6 @@ notebooks/*.html
 # local
 .env
 .DS_Store
+
+# synthetic datasets: generators and docs are committed, generated files are not
+datasets/*/out/

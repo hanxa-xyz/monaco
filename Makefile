@@ -1,4 +1,4 @@
-.PHONY: setup test lint sandbox funnel health demo skills clean
+.PHONY: setup test lint sandbox funnel health demo skills medal clean
 
 PY ?= python3
 
@@ -27,6 +27,9 @@ did:              ## difference-in-differences + event study under ./out/did
 	monaco-did
 
 demo: sandbox funnel health survival did   ## the whole thing, end to end, from a clean checkout
+
+medal:            ## synthetic Medal auto-clipping dataset under datasets/medal/out
+	$(PY) datasets/medal/generate_medal.py
 
 skills:           ## link ./skills into ~/.claude/skills so every project sees them
 	scripts/install_skills.sh
