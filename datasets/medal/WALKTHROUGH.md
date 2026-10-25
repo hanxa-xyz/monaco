@@ -107,6 +107,13 @@ to the SPEC, re-run the same builder to the same path. What would have to change
    metric changed." Roughly 60 lines of code plus one test; the chart-grammar rule "one chart per (view, dimension)" is
    preserved because the section id is the (view, dimension) pair.
 
+## Three worked answers (added after the gap list)
+
+`nb/build_01_packet_prepost.py`, `nb/build_02_holdout_ab.py`, `nb/build_03_did_controls.py` answer the case three ways on this
+data (see README). They are notebooks, not skills: they demonstrate gaps 1–4 and 7 (holdout + CUPED view, control-game DiD
+with a working event study via an integer week index, the MDE table, the pruning curve, KM on a 20k sample) without yet
+packaging them. Converting their cells into `monaco` functions + SKILL.md entries is the build list below.
+
 ## Suggested order to build (not started here)
 
 Gap 1 (holdout + CUPED view) → gap 2(i)+(iii) (cli_did dtype fix, close downgrade) → gap 3 (MDE table) → gap 4 (prune

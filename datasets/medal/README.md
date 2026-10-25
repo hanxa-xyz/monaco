@@ -82,3 +82,21 @@ diffs, not velocity · platform `*_events` are events, not distinct clips · cen
 - **Studio impact** → `studio_daily` for GJ vs Lethal Company (control), per-DAU normalization, and the plausibility ceiling (Medal reaches 7% of DAU).
 - **Partner health** → `studio_monthly` for concentration, launch-month error spikes, per-partner trends.
 - **General Intuition** → `clips` media columns: a "useful clip" is kept (not deleted), has `input_log_attached`, high `motion_score`; storage cost is `storage_mb`.
+
+## Three answers to the same case (`nb/`)
+
+Three executed notebooks answer the case prompt on this data, each with a different identification strategy, so the
+three closes can be laid side by side. Builders in `nb/`, outputs in `out/notebooks/`; each runs in ~10 s.
+
+| notebook | approach | what it uses | the cannibalization read it gives |
+|---|---|---|---|
+| `01_packet_prepost` | what the interview packet allows: log-linear + weekday baseline fit on 8 pre-launch weeks, projected over days 14–41; per-player rates; spike exclusion; plausibility ceiling for the studio funnel; pruning trade-off curve | packet-shaped tables only | RL manual clips/player −3% "within noise" (planted −12%: the window is too short and the holdout dilutes it) |
+| `02_holdout_ab` | the randomized 20% holdout: balance, ITT with intervals, CUPED, the selection trap (got-a-clip vs offered), weekly arms over time, heterogeneity, row-level trigger quality, MDE table for the next rollout | `player_launch_cohort`, `sessions`, `clips` | hotkey clips/session DiD on the weekly arms −11% |
+| `03_did_controls` | never-treated games as the counterfactual: 2×2 DiD, event study with pre-trend test, placebo on a control, studio DiD (GJ vs Lethal Company) with week-level SE, Kaplan-Meier time-to-delete | `game_weekly_panel`, `studio_daily`, `clips` | manual clips/player-day −11% (CI −13…−10, pre-trend p = 0.55) |
+
+```bash
+python3 datasets/medal/nb/build_01_packet_prepost.py && python3 datasets/medal/nb/build_02_holdout_ab.py && python3 datasets/medal/nb/build_03_did_controls.py
+```
+
+Shared helpers (`nb/medal_nb.py`): the projected-baseline estimator, Wilson rate tables, two-arm tables, the MDE table and
+the house-grammar charts. Where the three disagree in size, trust 02 (randomized) over 03 (controls) over 01 (projection).
