@@ -275,3 +275,112 @@ def mde_table(p0, n_treat_list, share_control, alpha=0.05, power=0.8):
 def close_md(game, headline, go, action, guardrail, revisit):
     return (f"### {game} — close\n\n**Headline:** {headline}\n\n**Go / No-go:** {go}\n\n**Action:** {action}\n\n"
             f"**Guardrail:** {guardrail}\n\n**Revisit:** {revisit}")
+
+
+# ------------------------------------------------------------------ synthetic control (one treated unit, a donor pool)
+def synth_weights(y_treated_pre, Y_donors_pre):
+    """Non-negative weights summing to 1 that best reproduce the treated pre-period series from the donors (SLSQP on the
+    simplex; falls back to NNLS + normalise). Returns (weights Series, pre RMSPE)."""
+    from scipy.optimize import minimize, nnls
+    Y = np.asarray(Y_donors_pre, float); y = np.asarray(y_treated_pre, float)
+    k = Y.shape[1]
+    w0, _ = nnls(Y, y); w0 = w0 / w0.sum() if w0.sum() > 0 else np.full(k, 1 / k)
+    res = minimize(lambda w: np.mean((Y @ w - y) ** 2), w0, bounds=[(0, 1)] * k, constraints=[{"type": "eq", "fun": lambda w: w.sum() - 1}], method="SLSQP")
+    w = res.x if res.success else w0
+    w = np.clip(w, 0, None); w = w / w.sum()
+    rmspe = float(np.sqrt(np.mean((Y @ w - y) ** 2)))
+    return pd.Series(w, index=Y_donors_pre.columns), rmspe
+
+
+def synth_control(wide, treated, donors, launch, fit_start=None, smooth=7, index=True):
+    """wide: date-indexed frame, one column per game (a daily metric). Fits weights on [fit_start, launch) after a rolling-mean
+    smooth, returns dict(path: DataFrame[treated, synthetic, gap], weights, rmspe_pre, rmspe_post, effect = mean gap over POST /
+    synthetic mean over POST). index=True divides every series by its own fit-window mean first (demeaned synthetic control):
+    simplex weights cannot scale a donor up or down, so levels must be matched by indexing, and the path is then in index units."""
+    s = wide.rolling(smooth, min_periods=max(1, smooth // 2)).mean().dropna()
+    fit_start = fit_start or (launch - D(FIT))
+    if index:
+        base = s[(s.index >= fit_start) & (s.index < launch)].mean()
+        s = s / base
+    pre = s[(s.index >= fit_start) & (s.index < launch)]
+    w, rm_pre = synth_weights(pre[treated], pre[donors])
+    synth = s[donors] @ w
+    path = pd.DataFrame({"treated": s[treated], "synthetic": synth}); path["gap"] = path.treated - path.synthetic
+    post = path[(path.index >= launch + D(RAMP)) & (path.index < launch + D(RAMP + POST))]
+    rm_post = float(np.sqrt(np.mean(post.gap ** 2)))
+    return dict(path=path, weights=w, rmspe_pre=rm_pre, rmspe_post=rm_post, effect=post.gap.mean() / post.synthetic.mean(),
+                gap_post=post.gap.mean(), ratio=rm_post / rm_pre if rm_pre > 0 else np.nan)
+
+
+def placebo_in_space(wide, treated, donors, launch, **kw):
+    """Run synth_control with each donor as the fake treated unit (remaining donors + the real treated excluded as donors).
+    Returns a table of post/pre RMSPE ratios and effects; the real unit's rank among them is the permutation p-value."""
+    rows = []
+    for fake in donors:
+        pool = [g for g in donors if g != fake]
+        r = synth_control(wide, fake, pool, launch, **kw)
+        rows.append(dict(unit=fake, effect=r["effect"], rmspe_pre=r["rmspe_pre"], rmspe_post=r["rmspe_post"], ratio=r["ratio"], placebo=True))
+    r = synth_control(wide, treated, donors, launch, **kw)
+    rows.append(dict(unit=treated, effect=r["effect"], rmspe_pre=r["rmspe_pre"], rmspe_post=r["rmspe_post"], ratio=r["ratio"], placebo=False))
+    t = pd.DataFrame(rows).sort_values("ratio", ascending=False).reset_index(drop=True)
+    t["rank"] = np.arange(1, len(t) + 1)
+    return t
+
+
+def plot_synth(r, launch, name, metric_label):
+    p = r["path"]
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6), sharex=True, gridspec_kw=dict(height_ratios=[2, 1]))
+    ax = axes[0]
+    ax.plot(p.index, p.treated, color=BLACK, lw=1.8, label=f"{name} (observed)")
+    ax.plot(p.index, p.synthetic, color=O_MID, lw=1.8, ls="--", label="synthetic (weighted donors)")
+    ax.axvline(launch, color=GRAY, ls="--", lw=1); ax.axvspan(launch + D(RAMP), launch + D(RAMP + POST), color=O_PALE, alpha=.5, lw=0)
+    ax.legend(fontsize=8, loc="upper left")
+    titled(ax, f"{name}: observed vs synthetic control — {metric_label}",
+           f"weights fit on {FIT} pre-launch days (7-day smoothed) · pre RMSPE {r['rmspe_pre']:.3f} · POST effect {r['effect']:+.1%} · orange band = POST window")
+    ax = axes[1]
+    ax.plot(p.index, p.gap, color=O_DARK, lw=1.4); ax.axhline(0, color=GRAY, lw=.8); ax.axvline(launch, color=GRAY, ls="--", lw=1)
+    ax.set_ylabel("gap (obs − synth)")
+    ax.xaxis.set_major_locator(mdates.MonthLocator()); ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+    fig.tight_layout()
+    return fig
+
+
+# ------------------------------------------------------------------ sensitivity to an unmeasured confounder
+def evalue(rr):
+    """E-value (VanderWeele & Ding): the minimum strength of association, on the risk-ratio scale, that an unmeasured confounder
+    would need with both treatment and outcome to explain away an observed risk ratio `rr`."""
+    rr = float(rr); rr = 1 / rr if rr < 1 else rr
+    return rr + np.sqrt(rr * (rr - 1)) if rr > 1 else 1.0
+
+
+# ------------------------------------------------------------------ power for counts and clustered designs
+def mde_grid(p0, n_total, holdout_shares, weeks, weekly_frac, icc=(0.0,), cluster_size=1, alpha=0.05, power=0.8, sd=None):
+    """Minimum detectable difference for a rate (sd=None → binomial) or a count (sd given), across holdout share × weeks × ICC.
+    n_total = eligible population; weekly_frac = share of it that becomes observable per week (cohort accrual);
+    design effect = 1 + (cluster_size − 1)·ICC for party/lobby randomization."""
+    za, zb = st.norm.ppf(1 - alpha / 2), st.norm.ppf(power)
+    rows = []
+    for wk in weeks:
+        n = n_total * min(1.0, weekly_frac * wk)
+        for sc in holdout_shares:
+            n_c, n_t = n * sc, n * (1 - sc)
+            for ic in icc:
+                deff = 1 + (cluster_size - 1) * ic
+                var = (sd ** 2 if sd is not None else p0 * (1 - p0)) * (1 / n_t + 1 / n_c) * deff
+                mde = (za + zb) * np.sqrt(var)
+                rows.append(dict(weeks=wk, holdout_share=sc, icc=ic, n_treated=int(n_t), n_control=int(n_c), design_effect=deff,
+                                 mde=mde, mde_rel=mde / p0 if p0 else np.nan))
+    return pd.DataFrame(rows)
+
+
+# ------------------------------------------------------------------ sizing dials
+def dials_table(cands, dials, haircuts=None):
+    """cands: DataFrame indexed by candidate with the dial columns; dials: ordered list of column names multiplied together;
+    haircuts: {col: factor} applied after. Returns the frame with a `prize` column and each step's running product."""
+    out = cands.copy(); run = np.ones(len(out))
+    for c in dials:
+        run = run * out[c].values; out[f"after_{c}"] = run
+    for c, f in (haircuts or {}).items():
+        run = run * (1 - out[c].values * f) if c in out else run * f; out[f"after_{c}_haircut"] = run
+    out["prize"] = run
+    return out.sort_values("prize", ascending=False)

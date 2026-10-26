@@ -107,12 +107,17 @@ to the SPEC, re-run the same builder to the same path. What would have to change
    metric changed." Roughly 60 lines of code plus one test; the chart-grammar rule "one chart per (view, dimension)" is
    preserved because the section id is the (view, dimension) pair.
 
-## Three worked answers (added after the gap list)
+## Nine worked answers (added after the gap list)
 
-`nb/build_01_packet_prepost.py`, `nb/build_02_holdout_ab.py`, `nb/build_03_did_controls.py` answer the case three ways on this
-data (see README). They are notebooks, not skills: they demonstrate gaps 1–4 and 7 (holdout + CUPED view, control-game DiD
-with a working event study via an integer week index, the MDE table, the pruning curve, KM on a 20k sample) without yet
-packaging them. Converting their cells into `monaco` functions + SKILL.md entries is the build list below.
+`nb/build_01..09` answer the case nine ways on this data (see README). They are notebooks, not skills: 01–06 are six
+identification routes to Case 1 (packet pre/post, holdout, DiD, synthetic control, IPW, model-ranked hypotheses); 07–09 are
+the likely Case 2 prompts (experiment design + MDE, next-integration sizing, useful clip + north star). They demonstrate
+gaps 1–7 without packaging them: the holdout/CUPED view (02), control-game DiD with a working event study via an integer
+week index and a week-level SE for the two-unit studio DiD (03), synthetic control with placebos — the rung
+`causal.method_ladder` marks "not implemented" (04), IPW with an E-value (05), the MDE grid with design effect (07), the
+pruning curve (01), KM on a 20k sample (03). Converting their cells into `monaco` functions + SKILL.md entries is the build
+list below; `nb/medal_nb.py` already holds the reusable pieces (`synth_control`, `placebo_in_space`, `evalue`, `mde_grid`,
+`dials_table`, `arm_table`, `rate_table`).
 
 ## Suggested order to build (not started here)
 

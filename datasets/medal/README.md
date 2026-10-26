@@ -83,20 +83,35 @@ diffs, not velocity · platform `*_events` are events, not distinct clips · cen
 - **Partner health** → `studio_monthly` for concentration, launch-month error spikes, per-partner trends.
 - **General Intuition** → `clips` media columns: a "useful clip" is kept (not deleted), has `input_log_attached`, high `motion_score`; storage cost is `storage_mb`.
 
-## Three answers to the same case (`nb/`)
+## Nine notebooks: six answers to Case 1, three for Case 2 (`nb/`)
 
-Three executed notebooks answer the case prompt on this data, each with a different identification strategy, so the
-three closes can be laid side by side. Builders in `nb/`, outputs in `out/notebooks/`; each runs in ~10 s.
+Builders in `nb/`, outputs in `out/notebooks/`; each runs in 10–40 s. Shared helpers in `nb/medal_nb.py` (projected
+baseline, Wilson rate tables, two-arm tables, synthetic control + placebos, E-value, MDE grid with design effect, sizing dials,
+house-grammar charts). Every notebook ends with the five-line close and a limits section.
 
-| notebook | approach | what it uses | the cannibalization read it gives |
+**Case 1 — "assess the impact of auto-clipping" — one question, six identification routes** (the ladder from weakest to strongest
+is 01 → 04 → 05 → 03 → 02; 06 ranks hypotheses for all of them):
+
+| notebook | approach | uses | Rocket League cannibalization read |
 |---|---|---|---|
-| `01_packet_prepost` | what the interview packet allows: log-linear + weekday baseline fit on 8 pre-launch weeks, projected over days 14–41; per-player rates; spike exclusion; plausibility ceiling for the studio funnel; pruning trade-off curve | packet-shaped tables only | RL manual clips/player −3% "within noise" (planted −12%: the window is too short and the holdout dilutes it) |
-| `02_holdout_ab` | the randomized 20% holdout: balance, ITT with intervals, CUPED, the selection trap (got-a-clip vs offered), weekly arms over time, heterogeneity, row-level trigger quality, MDE table for the next rollout | `player_launch_cohort`, `sessions`, `clips` | hotkey clips/session DiD on the weekly arms −11% |
-| `03_did_controls` | never-treated games as the counterfactual: 2×2 DiD, event study with pre-trend test, placebo on a control, studio DiD (GJ vs Lethal Company) with week-level SE, Kaplan-Meier time-to-delete | `game_weekly_panel`, `studio_daily`, `clips` | manual clips/player-day −11% (CI −13…−10, pre-trend p = 0.55) |
+| `01_packet_prepost` | packet-only: log-linear + weekday baseline projected over days 14–41; per-player rates; spike exclusion; plausibility ceiling; pruning curve | packet tables | −3% "within noise" (planted −12%: short window, holdout dilution) |
+| `02_holdout_ab` | randomized 20% holdout: balance, ITT, CUPED, selection trap, weekly arms, heterogeneity, row-level trigger quality, MDE | cohort, sessions, clips | −11% (DiD on the weekly arms) |
+| `03_did_controls` | never-treated games as controls: 2×2 DiD, event study + pre-trend test, placebo, studio DiD with week-level SE, Kaplan-Meier | weekly panel, studio_daily, clips | −11% (CI −13…−10, pre-trend p 0.55) |
+| `04_synthetic_control` | donor-weighted counterfactual on indexed daily series; in-space and in-time placebos | game_daily | −5.5%, rank 1/5 among placebos (4 donors: under-recovers) |
+| `05_ipw_got_autoclip` | propensity / IPW on "got a clip" with pre covariates; overlap, balance, E-value; compared with the holdout it cannot see | cohort | retention: naive +29 pp → IPW +8 pp → randomized +3.5 pp |
+| `06_model_hypotheses` | RF + XGB on clip shares and player retention; tripwire; PDPs; hypotheses mapped to the designs above | clips, cohort | pre-launch activity dominates retention; arm ≈ 0 importance |
+
+**Case 2 — the three most likely 20-minute prompts:**
+
+| notebook | prompt | what it produces |
+|---|---|---|
+| `07_experiment_design` | design the next rollout | the brief (hypothesis, primary, guardrails, unit, exposure, analysis, stopping), MDE grid by holdout share × weeks × ICC, horizon table (accrual + 4 weeks maturation) |
+| `08_next_integration` | which game next, how big | dials per candidate (players × sessions × triggers × keep × share), two routes to the number, concentration, storage cost, paid-game copies at two rates, ranked shortlist |
+| `09_useful_clip_northstar` | what is a useful clip (GI); north star | useful = kept ∧ labelled ∧ motion ≥ 0.5 with threshold sensitivity; penetration by trigger; junk storage cost; deleted-clips argument both ways; six north-star candidates tested pre/post |
 
 ```bash
-python3 datasets/medal/nb/build_01_packet_prepost.py && python3 datasets/medal/nb/build_02_holdout_ab.py && python3 datasets/medal/nb/build_03_did_controls.py
+for n in 01_packet_prepost 02_holdout_ab 03_did_controls 04_synthetic_control 05_ipw_got_autoclip 06_model_hypotheses 07_experiment_design 08_next_integration 09_useful_clip_northstar; do python3 datasets/medal/nb/build_$n.py | tail -1; done
 ```
 
-Shared helpers (`nb/medal_nb.py`): the projected-baseline estimator, Wilson rate tables, two-arm tables, the MDE table and
-the house-grammar charts. Where the three disagree in size, trust 02 (randomized) over 03 (controls) over 01 (projection).
+Where the Case 1 notebooks disagree in size, trust 02 (randomized) over 03 (controls) over 04 (synthetic) over 05 (IPW) over 01
+(projection). The agreement in sign across all of them is the argument to make in the room.
