@@ -30,6 +30,7 @@ monaco-funnel = "monaco.cli_funnel:main"
 monaco-partner-health = "monaco.cli_partner_health:main"
 monaco-survival = "monaco.cli_survival:main"
 monaco-did = "monaco.cli_did:main"
+monaco-nb = "monaco.nbx:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

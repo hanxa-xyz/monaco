@@ -70,6 +70,7 @@ v.table
 | `monaco.viz` | palette and chart grammar (`titled`, `apply_style`, `save_fig`/`img`, notebook cell helpers) |
 | `monaco.eda` | structure · trio · penetration · mix · distribution · time · saturation · pareto |
 | `monaco.eda_build` / `model_build` | SPEC dict → one executed notebook |
+| `monaco.nbx` | `monaco-nb`: add or replace one (view, dimension) section in an existing notebook, run only that cell — the live mode of `/eda-*` |
 | `monaco.modeling` | RandomForest + XGBoost, deterministic decisions, leakage tripwire, PDPs, ranked hypotheses |
 | `monaco.funnel` | W-day conversion with Wilson CIs and censoring-aware denominators, cohort lines, time-to-stage CDFs, retention triangle |
 | `monaco.partner_health` | Lorenz/Gini/HHI, small-multiple trends with intervals, flags net of the portfolio's own move |

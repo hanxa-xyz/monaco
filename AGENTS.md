@@ -17,6 +17,7 @@ them up in this checkout, and installable elsewhere with `scripts/install_skills
 | `src/monaco/viz.py` | palette (black + one orange ramp + grey), `titled()`, `apply_style()`, `save_fig()`/`img()`, notebook cell helpers |
 | `src/monaco/eda.py` | the fixed EDA vocabulary: `structure · trio · penetration · mix · distribution · time_series · saturation · pareto` |
 | `src/monaco/eda_build.py` | `build_from_spec(SPEC, out.ipynb)` → one executed EDA notebook |
+| `src/monaco/nbx.py` | `monaco-nb <nb> <view> …`: upsert ONE tagged (view, dimension) section in an existing notebook and execute only setup + that cell — the live-interview mode of the `/eda-*` skills |
 | `src/monaco/modeling.py` | RF + XGBoost exploratory pass; deterministic decisions printed; leakage tripwire |
 | `src/monaco/model_build.py` | `build_model_notebook(SPEC, out.ipynb)` |
 | `src/monaco/stats.py` | `wilson()`, `pct()`, `money()` |
@@ -34,7 +35,7 @@ them up in this checkout, and installable elsewhere with `scripts/install_skills
 | `docs/causal.md`, `docs/survival.md` | the causal ladder and its assumptions; time-to-event with censoring |
 | `tests/` | pytest; runs in seconds with no data files |
 
-Entry points after `pip install -e ".[all]"`: `monaco-sandbox`, `monaco-funnel`, `monaco-partner-health`, `monaco-survival`, `monaco-did`.
+Entry points after `pip install -e ".[all]"`: `monaco-sandbox`, `monaco-funnel`, `monaco-partner-health`, `monaco-survival`, `monaco-did`, `monaco-nb`.
 Data goes to `$MONACO_DATA` (default `./data`), outputs to `$MONACO_OUT` (default `./out`). Both are gitignored.
 
 ## Rules the code enforces (do not route around them)
@@ -50,6 +51,8 @@ Data goes to `$MONACO_DATA` (default `./data`), outputs to `$MONACO_OUT` (defaul
    `monaco.viz`; never redeclare a colour.
 4. **One chart per (view, dimension).** The combinatorial explosion is the enemy. More charts means adding a
    dimension to the SPEC on purpose, not looping.
+   Live, `monaco-nb <nb> <view> --dim …` adds or replaces exactly one such section in place (cells are tagged `nbx:section:<view>:<dim>`);
+   it never regenerates the notebook and never writes PNGs.
 5. **Grain first.** Say what one row is before computing anything. Rates state their denominator and their
    censoring rule (a 30-day rate only includes rows old enough to have had 30 days).
 6. **Pooled and group-weighted travel together.** Report both; a gap between them is a mix story, not a product story.

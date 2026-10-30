@@ -27,6 +27,7 @@ If you want more, add a dimension to the spec deliberately.
 """
 import os
 
+from monaco.nbx import SETUP_TAG, STOP_TAG, section_tag, tag
 from monaco.viz import build_and_execute, code, md, new_notebook
 
 ALL_VIEWS = ['structure', 'trio', 'penetration', 'mix', 'distribution', 'time', 'saturation', 'pareto']
@@ -59,57 +60,57 @@ def build_from_spec(spec, out_path, workdir=None):
                 "Fixed vocabulary, one chart per (view, dimension), every table printed. Sections: "
                 + ' → '.join(f'**{v}**' for v in views) + '.'))
     C.append(md("## 0 · Setup"))
-    C.append(code("import warnings; warnings.filterwarnings('ignore')\nimport sys, os\n"
+    C.append(tag(code("import warnings; warnings.filterwarnings('ignore')\nimport sys, os\n"
                   + (f"sys.path.insert(0, os.path.abspath({repr(S['toolkit_rel'])}))\n" if S.get('toolkit_rel') else "") +
                   "import pandas as pd, numpy as np\nimport matplotlib.pyplot as plt\n"
                   "from monaco.viz import apply_style\nfrom monaco.eda import structure, trio, penetration, mix, distribution, time_series, saturation, pareto\n"
                   "apply_style(dpi=110); pd.set_option('display.width', 220)\n\n" + S['setup_code'].strip() +
                   ("\n\n# --- derived columns ---\n" + S['derive_code'].strip() if S.get('derive_code') else '') +
-                  "\nprint('df:', df.shape)"))
+                  "\nprint('df:', df.shape)"), SETUP_TAG))
     n = 0
     for v in views:
         n += 1
         C.append(md(f"## {n} · {v}\n{WHAT[v]}"))
         if v == 'structure':
             tabs = "TABLES if 'TABLES' in dir() else {'df': df}"
-            C.append(code(_show(f"structure({tabs}, keys={repr(S.get('keys', {}))})").replace('print(v.table.to_string())\n', '')))
+            C.append(tag(code(_show(f"structure({tabs}, keys={repr(S.get('keys', {}))})").replace('print(v.table.to_string())\n', '')), section_tag('structure')))
         elif v == 'trio':
             if not (metric and dims):
                 C.append(md("_skipped: needs `metric` and `dims` in the spec._")); continue
             for d in dims:
-                C.append(code(_show(f"trio(df, {repr(d)}, {repr(metric)}, entity={ent_r}, metric_label={ml}, entity_label={el})")))
+                C.append(tag(code(_show(f"trio(df, {repr(d)}, {repr(metric)}, entity={ent_r}, metric_label={ml}, entity_label={el})")), section_tag(f'trio:{d}')))
         elif v == 'penetration':
             if not (S.get('flag') and dims):
                 C.append(md("_skipped: no `flag` (0/1 column) in the spec._")); continue
             for d in dims:
-                C.append(code(_show(f"penetration(df, {repr(d)}, {repr(S['flag'])}, flag_label={repr(S.get('flag_label', S['flag']))}, entity={ent_r})")))
+                C.append(tag(code(_show(f"penetration(df, {repr(d)}, {repr(S['flag'])}, flag_label={repr(S.get('flag_label', S['flag']))}, entity={ent_r})")), section_tag(f'penetration:{d}')))
         elif v == 'mix':
             if not S.get('mix'):
                 C.append(md("_skipped: no `mix` pairs in the spec._")); continue
             for d, b in S['mix']:
-                C.append(code(_show(f"mix(df, {repr(d)}, {repr(b)}, entity={ent_r})")))
+                C.append(tag(code(_show(f"mix(df, {repr(d)}, {repr(b)}, entity={ent_r})")), section_tag(f'mix:{d}')))
         elif v == 'distribution':
             if not dims:
                 C.append(md("_skipped: no `dims`._")); continue
             for d in dims:
-                C.append(code(_show(f"distribution(df, {repr(d)}, metric={repr(metric)}, entity={ent_r}, metric_label={ml}, entity_label={el})")))
+                C.append(tag(code(_show(f"distribution(df, {repr(d)}, metric={repr(metric)}, entity={ent_r}, metric_label={ml}, entity_label={el})")), section_tag(f'distribution:{d}')))
         elif v == 'time':
             t = S.get('time')
             if not t:
                 C.append(md("_skipped: no time column in the spec (the data has no time dimension)._")); continue
-            C.append(code(_show(f"time_series(df, {repr(t['col'])}, metric={repr(metric)}, freq={repr(t.get('freq', 'M'))}, split={repr(t.get('split'))}, metric_label={ml}, entity={ent_r})")))
+            C.append(tag(code(_show(f"time_series(df, {repr(t['col'])}, metric={repr(metric)}, freq={repr(t.get('freq', 'M'))}, split={repr(t.get('split'))}, metric_label={ml}, entity={ent_r})")), section_tag(f"time:{t['col']}")))
         elif v == 'saturation':
             if not S.get('saturation'):
                 C.append(md("_skipped: no `saturation` entries in the spec._")); continue
             for s in S['saturation']:
-                C.append(code(f"v, ks = saturation(df, {repr(s['entity'])}, count_col={repr(s.get('count_col'))}, label={repr(s.get('label'))})\n"
-                              "print(v.table.to_string()); print(); print('k needed:', ks); print(v.note)\nplt.show()"))
+                C.append(tag(code(f"v, ks = saturation(df, {repr(s['entity'])}, count_col={repr(s.get('count_col'))}, label={repr(s.get('label'))})\n"
+                                  "print(v.table.to_string()); print(); print('k needed:', ks); print(v.note)\nplt.show()"), section_tag(f"saturation:{s['entity']}")))
         elif v == 'pareto':
             if not S.get('pareto'):
                 C.append(md("_skipped: no `pareto` entries in the spec._")); continue
             for p in S['pareto']:
-                C.append(code(f"v, tiers = pareto(df, {repr(p['entity'])}, {repr(p['value'])}, label={repr(p.get('label'))})\n"
-                              "print(v.table.to_string()); print(); print(v.note)\nplt.show()"))
-    C.append(md("## Stop condition\nEvery requested view rendered once per dimension. Do not add views or dimensions here — "
-                "hypotheses go to the deep-dive notebooks; this notebook is the map, not the argument."))
+                C.append(tag(code(f"v, tiers = pareto(df, {repr(p['entity'])}, {repr(p['value'])}, label={repr(p.get('label'))})\n"
+                                  "print(v.table.to_string()); print(); print(v.note)\nplt.show()"), section_tag(f"pareto:{p['entity']}")))
+    C.append(tag(md("## Stop condition\nEvery requested view rendered once per dimension. Do not add views or dimensions here — "
+                "hypotheses go to the deep-dive notebooks; this notebook is the map, not the argument."), STOP_TAG))
     build_and_execute(nb, out_path, workdir=workdir or os.path.dirname(os.path.abspath(out_path)))

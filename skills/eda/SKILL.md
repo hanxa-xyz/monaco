@@ -43,6 +43,16 @@ rate of a 0/1 flag); "share of X within age band" is **mix**, not "share of wall
    `src/monaco/eda.py`, not per notebook.
 5. Facts that surprised you → HANDOFF §3 (numbers only from the printed tables).
 
+
+## In-place mode (live interview): `/eda <notebook.ipynb>` or any `/eda-<view> <notebook.ipynb>`
+A notebook path as the argument switches from "build the whole notebook from a SPEC" to "add or replace one section in
+this notebook". `monaco-nb` (`src/monaco/nbx.py`) upserts a (view, dimension) section addressed by a cell tag, executes only
+the setup cell plus that cell, saves, and prints the table — no PNGs, no regeneration. `build_from_spec` tags every cell it
+writes (`nbx:setup`, `nbx:section:<view>:<dim>`, `nbx:stop`), so a notebook built by `/eda` can be extended live; a notebook
+built elsewhere works too (fallback: the first code cell is the setup, new sections append at the end).
+Procedure: `monaco-nb <nb> --columns` if needed → ask one question ("<view> on <dim>, flag <f> — is this right?") → run →
+paste the table → stop. One section per call; a re-run with the same dim replaces, `--id` keeps both.
+
 ## Guardrails
 - One chart per (view, dimension). Never metric × dim × view cross-products. More charts = add a
   dimension to the SPEC on purpose, or run a second spec.
